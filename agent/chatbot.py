@@ -18,8 +18,11 @@ class OpenAI:
     def __init__(self, **kwargs):
         self.messages = kwargs.get("messages", [])
         self.model = kwargs.get("model", "gpt-3.5-turbo")
-        self.temperature = kwargs.get("temperature", 0.0)
+        self.temperature = kwargs.get("temperature", None)
         self.pl_tags = kwargs.get("pl_tags", [])
+
+    def add_message(self, role, content):
+        self.messages.append({"role": role, "content": content})
 
     def chat(self, user_message):
         self.messages.append({"role": "user", "content": user_message})
@@ -37,8 +40,14 @@ class Claude:
     def __init__(self, **kwargs):
         self.messages = kwargs.get("messages", "")
         self.model = kwargs.get("model", "claude-2")
-        self.temperature = kwargs.get("temperature", 0.7)
+        self.temperature = kwargs.get("temperature", None)
         self.pl_tags = kwargs.get("pl_tags", [])
+
+    def add_message(self, role, content):
+        if role == "assistant":
+            self.messages += anthropic.AI_PROMPT + " " + content
+        else:
+            self.messages += anthropic.HUMAN_PROMPT + " " + content
 
     def chat(self, user_message):
         self.messages += (
