@@ -37,7 +37,7 @@ system_message = """===
   b. 在本次融资前你们有否融过资？如有，请提供上轮融资时间，融资金额，出让比例。"""
 
 if "infobot_v2" not in st.session_state:
-    st.session_state.infobot_v2 = agent.OpenAI(model="gpt-4", pl_tags=["info_v2"])
+    st.session_state.infobot_v2 = agent.OpenAI(model="gpt-4", temperature=0.0, pl_tags=["info_v2"])
     st.session_state.infobot_v2.messages = [
         {"role": "system", "content": system_message},
         {

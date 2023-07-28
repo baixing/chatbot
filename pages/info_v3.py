@@ -37,7 +37,7 @@ system_message = """===
   b. 在本次融资前你们有否融过资？如有，请提供上轮融资时间，融资金额，出让比例。"""
 
 if "infobot_v3" not in st.session_state:
-    st.session_state.infobot_v3 = agent.Claude(pl_tags=["info_v3"])
+    st.session_state.infobot_v3 = agent.Claude(temperature=0.0, pl_tags=["info_v3"])
     HUMAN_PROMPT = "\n\nHuman:"
     AI_PROMPT = "\n\nAssistant:"
     st.session_state.infobot_v3.messages = (
