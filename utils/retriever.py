@@ -35,9 +35,10 @@ def retrieve_contexts(question, document_ids, priority="qa"):
             for result in document_results
         ]
 
-    if priority == "qa":
+    context = []
+    if priority == "qa" and qa_results:
         contexts = qa_contexts
-    elif priority == "document":
+    elif priority == "document" and document_results:
         contexts = document_contexts
 
     return contexts
