@@ -25,14 +25,14 @@ def retrieve_contexts(question, document_ids, priority="qa"):
                 "correct_answer": result["correct_answer"],
                 "score": result["score"],
             }
-            for result in results
+            for result in qa_results
         ]
 
     document_results = retrieve("document", question, document_ids, 3)
     if document_results:
         document_contexts = [
             {"content": result["content"], "score": result["score"]}
-            for result in results
+            for result in document_results
         ]
 
     if priority == "qa":
