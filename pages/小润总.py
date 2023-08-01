@@ -154,7 +154,7 @@ if user_message := st.chat_input("你好！"):
             "chato_file_1115",
         ],
     )
-    if contexts[0]["score"] > 0.81:
+    if contexts[0]["score"] > 0.8:
         user_message = f"""===
 刘润过去聊过的、可能相关的话题：
 {str(contexts[0])}

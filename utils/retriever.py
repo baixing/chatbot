@@ -2,7 +2,7 @@ import requests
 import json
 
 
-def retrieve_contexts(question, document_ids):
+def retrieve_contexts(question, document_ids, priority="qa"):
     def retrieve(source, question, document_ids, top_k):
         if source == "qa":
             url = "https://api.chato.cn/test/api/query/qa"
@@ -17,9 +17,9 @@ def retrieve_contexts(question, document_ids):
         result = response.json()
         return result["data"]
 
-    results = retrieve("qa", question, document_ids, 1)
-    if results:
-        contexts = [
+    qa_results = retrieve("qa", question, document_ids, 3)
+    if qa_results:
+        qa_contexts = [
             {
                 "question": result["question"],
                 "correct_answer": result["correct_answer"],
@@ -27,10 +27,17 @@ def retrieve_contexts(question, document_ids):
             }
             for result in results
         ]
-    if not results:
-        results = retrieve("document", question, document_ids, 5)
-        contexts = [
+
+    document_results = retrieve("document", question, document_ids, 3)
+    if document_results:
+        document_contexts = [
             {"content": result["content"], "score": result["score"]}
             for result in results
         ]
+
+    if priority == "qa":
+        contexts = qa_contexts
+    elif priority == "document":
+        contexts = document_contexts
+
     return contexts
