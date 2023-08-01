@@ -99,7 +99,7 @@ if user_message := st.chat_input("你好！"):
     st.session_state.messages.append({"role": "user", "content": user_message})
 
     # 发给ChatBot
-    call_function, assistant_message = st.session_state.chatbot.chat(
+    call_function, assistant_message = st.session_state.chatbot.chat_no_stream(
         user_message, function_call=True
     )
 
@@ -119,7 +119,7 @@ if user_message := st.chat_input("你好！"):
                         functions,
                         pl_tags=[page_title],
                     )
-                    assistant_message = st.session_state.chatbot.chat(
+                    assistant_message = st.session_state.chatbot.chat_no_stream(
                         "", function_call=False
                     )
                     st.session_state.messages.append(

@@ -81,7 +81,7 @@ if user_message := st.chat_input("你好！"):
     st.session_state.messages.append({"role": "user", "content": user_message})
 
     # 发给ChatBot
-    assistant_response = st.session_state.chatbot.chat(user_message, stream=True)
+    assistant_response = st.session_state.chatbot.chat(user_message)
 
     # 渲染并储存ChatBot消息
     assistant_message = ""

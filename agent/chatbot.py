@@ -26,43 +26,44 @@ class OpenAI:
     def add_message(self, role, content):
         self.messages.append({"role": role, "content": content})
 
-    def chat(self, user_message, stream=True, function_call=False):
+    def chat_no_stream(self, user_message, function_call=False):
         self.messages.append({"role": "user", "content": user_message})
-        if not stream:
-            if not function_call:
-                assistant_message = openai.ChatCompletion.create(
-                    messages=self.messages,
-                    model=self.model,
-                    temperature=self.temperature,
-                    pl_tags=self.pl_tags,
-                )["choices"][0]["message"]
-                self.messages.append(assistant_message)
-                return assistant_message["content"]
-            else:
-                assistant_message = openai.ChatCompletion.create(
-                    messages=self.messages,
-                    functions=self.functions,
-                    model=self.model,
-                    temperature=self.temperature,
-                    pl_tags=self.pl_tags,
-                )["choices"][0]["message"]
-                if assistant_message["content"]:
-                    self.messages.append(assistant_message)
-                    return False, assistant_message["content"]
-                else:
-                    return True, assistant_message["function_call"]
-        else:
-            assistant_response = openai.ChatCompletion.create(
+        if not function_call:
+            assistant_message = openai.ChatCompletion.create(
                 messages=self.messages,
                 model=self.model,
                 temperature=self.temperature,
-                stream=True,
                 pl_tags=self.pl_tags,
-            )
-            for chunk in assistant_response:
-                chunk = chunk["choices"][0]["delta"]
-                if chunk.get("content"):
-                    yield chunk["content"]
+            )["choices"][0]["message"]
+            self.messages.append(assistant_message)
+            return assistant_message["content"]
+        else:
+            assistant_message = openai.ChatCompletion.create(
+                messages=self.messages,
+                functions=self.functions,
+                model=self.model,
+                temperature=self.temperature,
+                pl_tags=self.pl_tags,
+            )["choices"][0]["message"]
+            if assistant_message["content"]:
+                self.messages.append(assistant_message)
+                return False, assistant_message["content"]
+            else:
+                return True, assistant_message["function_call"]
+
+    def chat(self, user_message):
+        self.messages.append({"role": "user", "content": user_message})
+        assistant_response = openai.ChatCompletion.create(
+            messages=self.messages,
+            model=self.model,
+            temperature=self.temperature,
+            stream=True,
+            pl_tags=self.pl_tags,
+        )
+        for chunk in assistant_response:
+            chunk = chunk["choices"][0]["delta"]
+            if chunk.get("content"):
+                yield chunk["content"]
 
 
 class Claude:
@@ -78,29 +79,33 @@ class Claude:
         else:
             self.messages += anthropic.HUMAN_PROMPT + " " + content
 
-    def chat(self, user_message, stream=True):
+    def chat_no_stream(self, user_message):
         self.messages += (
             anthropic.HUMAN_PROMPT + " " + user_message + anthropic.AI_PROMPT + " "
         )
         claude = anthropic.Anthropic()
-        if not stream:
-            assistant_message = claude.completions.create(
-                prompt=self.messages,
-                model=self.model,
-                temperature=self.temperature,
-                max_tokens_to_sample=2048,
-                pl_tags=self.pl_tags,
-            ).completion
-            self.messages += assistant_message
-            return assistant_message
-        else:
-            assistant_response = claude.completions.create(
-                prompt=self.messages,
-                model=self.model,
-                temperature=self.temperature,
-                max_tokens_to_sample=2048,
-                stream=True,
-                pl_tags=self.pl_tags,
-            )
-            for chunk in assistant_response:
-                yield chunk.completion
+        assistant_message = claude.completions.create(
+            prompt=self.messages,
+            model=self.model,
+            temperature=self.temperature,
+            max_tokens_to_sample=2048,
+            pl_tags=self.pl_tags,
+        ).completion
+        self.messages += assistant_message
+        return assistant_message
+
+    def chat(self, user_message):
+        self.messages += (
+            anthropic.HUMAN_PROMPT + " " + user_message + anthropic.AI_PROMPT + " "
+        )
+        claude = anthropic.Anthropic()
+        assistant_response = claude.completions.create(
+            prompt=self.messages,
+            model=self.model,
+            temperature=self.temperature,
+            max_tokens_to_sample=2048,
+            stream=True,
+            pl_tags=self.pl_tags,
+        )
+        for chunk in assistant_response:
+            yield chunk.completion
