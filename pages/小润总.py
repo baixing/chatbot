@@ -76,9 +76,83 @@ if user_message := st.chat_input("你好！"):
     # 渲染并储存用户消息
     with st.chat_message(name="user", avatar="🧑‍💻"):
         st.markdown(user_message)
+    st.session_state.messages.append({"role": "user", "content": user_message})
+
+    # 取相关QA和文档
     contexts = retrieve_contexts(
         question="你好",
-        document_ids=['chato_file_862', 'chato_file_863', 'chato_file_864', 'chato_file_865', 'chato_file_866', 'chato_file_867', 'chato_file_868', 'chato_file_869', 'chato_file_870', 'chato_file_871', 'chato_file_872', 'chato_file_873', 'chato_file_1058', 'chato_file_1059', 'chato_file_1060', 'chato_file_1061', 'chato_file_1062', 'chato_file_1063', 'chato_file_1064', 'chato_file_1065', 'chato_file_1066', 'chato_file_1067', 'chato_file_1068', 'chato_file_1069', 'chato_file_1070', 'chato_file_1071', 'chato_file_1072', 'chato_file_1073', 'chato_file_1074', 'chato_file_1075', 'chato_file_1076', 'chato_file_1077', 'chato_file_1078', 'chato_file_1079', 'chato_file_1080', 'chato_file_1081', 'chato_file_1082', 'chato_file_1083', 'chato_file_1084', 'chato_file_1085', 'chato_file_1086', 'chato_file_1087', 'chato_file_1088', 'chato_file_1089', 'chato_file_1090', 'chato_file_1091', 'chato_file_1092', 'chato_file_1093', 'chato_file_1094', 'chato_file_1095', 'chato_file_1096', 'chato_file_1097', 'chato_file_1098', 'chato_file_1099', 'chato_file_1100', 'chato_file_1101', 'chato_file_1102', 'chato_file_1103', 'chato_file_1104', 'chato_file_1105', 'chato_file_1106', 'chato_file_1107', 'chato_file_1108', 'chato_file_1109', 'chato_file_1110', 'chato_file_1111', 'chato_file_1112', 'chato_file_1113', 'chato_file_1114', 'chato_file_1115'],
+        document_ids=[
+            "chato_file_862",
+            "chato_file_863",
+            "chato_file_864",
+            "chato_file_865",
+            "chato_file_866",
+            "chato_file_867",
+            "chato_file_868",
+            "chato_file_869",
+            "chato_file_870",
+            "chato_file_871",
+            "chato_file_872",
+            "chato_file_873",
+            "chato_file_1058",
+            "chato_file_1059",
+            "chato_file_1060",
+            "chato_file_1061",
+            "chato_file_1062",
+            "chato_file_1063",
+            "chato_file_1064",
+            "chato_file_1065",
+            "chato_file_1066",
+            "chato_file_1067",
+            "chato_file_1068",
+            "chato_file_1069",
+            "chato_file_1070",
+            "chato_file_1071",
+            "chato_file_1072",
+            "chato_file_1073",
+            "chato_file_1074",
+            "chato_file_1075",
+            "chato_file_1076",
+            "chato_file_1077",
+            "chato_file_1078",
+            "chato_file_1079",
+            "chato_file_1080",
+            "chato_file_1081",
+            "chato_file_1082",
+            "chato_file_1083",
+            "chato_file_1084",
+            "chato_file_1085",
+            "chato_file_1086",
+            "chato_file_1087",
+            "chato_file_1088",
+            "chato_file_1089",
+            "chato_file_1090",
+            "chato_file_1091",
+            "chato_file_1092",
+            "chato_file_1093",
+            "chato_file_1094",
+            "chato_file_1095",
+            "chato_file_1096",
+            "chato_file_1097",
+            "chato_file_1098",
+            "chato_file_1099",
+            "chato_file_1100",
+            "chato_file_1101",
+            "chato_file_1102",
+            "chato_file_1103",
+            "chato_file_1104",
+            "chato_file_1105",
+            "chato_file_1106",
+            "chato_file_1107",
+            "chato_file_1108",
+            "chato_file_1109",
+            "chato_file_1110",
+            "chato_file_1111",
+            "chato_file_1112",
+            "chato_file_1113",
+            "chato_file_1114",
+            "chato_file_1115",
+        ],
     )
     if contexts[0]["score"] > 0.81:
         user_message = f"""===
@@ -89,7 +163,6 @@ if user_message := st.chat_input("你好！"):
 {user_message}
 ===
 小润总模仿刘润本人的回答："""
-    st.session_state.messages.append({"role": "user", "content": user_message})
 
     # 发给ChatBot
     assistant_message = st.session_state.chatbot.chat(user_message)
