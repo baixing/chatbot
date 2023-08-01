@@ -33,7 +33,7 @@ form_system_message = f"""===
 本轮对话中，请扮演一个信息收集者，向用户收集信息。你将在谈话中不紧不慢地、一步步完善地询问和了解他们的信息。
 如果用户的回答不符合要求或明显不合理，你将提醒他们重新回答。
 如果你觉得他们的某个回答很不完整，或是有值得拓展之处，你将深入下去，多问几个问题，不断追问，直到你觉得清楚明白了为止。
-最后，聊完以后，如果你确认收集全了所有的信息，请将你收集到的信息总结一遍告诉用户，待得到确认后，提交信息表单。
+最后，聊完以后，如果你确认收集全了所有的信息，请将你收集到的信息总结一遍告诉用户，待得到确认后，请调用submit_form函数提交信息表单。
 ===
 需要向用户收集的信息:
 {info_to_collect}"""
@@ -45,7 +45,7 @@ def apply_status():
         functions = [
             {
                 "name": "start_form",
-                "description": "Starts the process of filling out the form",
+                "description": "Starts the process of filling out the form or collecting the needed information",
                 "parameters": {"type": "object", "properties": {}},
             },
         ]
@@ -111,12 +111,6 @@ if user_message := st.chat_input("你好！"):
 
                 def start_button_on_click():
                     st.session_state.status = "form"
-                    st.session_state.messages.append(
-                        {
-                            "role": "assistant",
-                            "content": "开始填写表单！",
-                        }
-                    )
                     system_message, functions = apply_status()
                     create_chatbot(
                         model,
@@ -125,11 +119,11 @@ if user_message := st.chat_input("你好！"):
                         functions,
                         pl_tags=[page_title],
                     )
-                    next_assistant_message = st.session_state.chatbot.chat(
+                    assistant_message = st.session_state.chatbot.chat(
                         "", function_call=False
-                    )[1]
+                    )
                     st.session_state.messages.append(
-                        {"role": "assistant", "content": next_assistant_message}
+                        {"role": "assistant", "content": assistant_message}
                     )
 
                 st.button(label="开始", on_click=start_button_on_click)
