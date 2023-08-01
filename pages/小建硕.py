@@ -710,7 +710,7 @@ if user_message := st.chat_input("你好！"):
         ],
         priority="document",
     )
-    if contexts[0]["score"] > 0.8:
+    if contexts and contexts[0]["score"] > 0.8:
         user_message = f"""===
 王建硕过去聊过的、可能相关的话题：
 {str(contexts[0])}
