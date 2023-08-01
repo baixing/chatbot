@@ -165,11 +165,19 @@ if user_message := st.chat_input("你好！"):
 小润总模仿刘润本人的回答："""
 
     # 发给ChatBot
-    assistant_message = st.session_state.chatbot.chat(user_message)
+    assistant_response = st.session_state.chatbot.chat(user_message, stream=True)
 
     # 渲染并储存ChatBot消息
+    assistant_message = ""
     with st.chat_message(name="assistant", avatar="🤖"):
+        placeholder = st.empty()
+        for token in assistant_response:
+            assistant_message += token
+            placeholder.write(assistant_message + "▌")
+        placeholder.empty()
         st.markdown(assistant_message)
+
+    st.session_state.chatbot.add_message("assistant", assistant_message)
     st.session_state.messages.append(
         {"role": "assistant", "content": assistant_message}
     )
