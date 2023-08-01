@@ -17,15 +17,18 @@ def render_messages(messages):
 def create_chatbot(model, temperature, system_message, functions=None, pl_tags=[]):
     if model == "GPT-3.5":
         st.session_state.chatbot = agent.OpenAI(
-            functions=functions, temperature=temperature, pl_tags=pl_tags
+            functions=functions,
+            model="gpt-3.5-turbo",
+            temperature=temperature,
+            pl_tags=pl_tags,
         )
     elif model == "GPT-4":
         st.session_state.chatbot = agent.OpenAI(
-            functions=functions, temperature=temperature, model="gpt-4", pl_tags=pl_tags
+            functions=functions, model="gpt-4", temperature=temperature, pl_tags=pl_tags
         )
     elif model == "Claude 2":
         st.session_state.chatbot = agent.Claude(
-            temperature=temperature, pl_tags=pl_tags
+            model="claude-2", temperature=temperature, pl_tags=pl_tags
         )
     if system_message:
         st.session_state.chatbot.add_message(
