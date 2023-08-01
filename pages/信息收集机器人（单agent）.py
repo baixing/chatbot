@@ -63,6 +63,7 @@ if st.session_state.current_page != page_title or "chatbot" not in st.session_st
 
 if clean_history:
     st.session_state.messages = []
+    create_chatbot(model, temperature, system_message, pl_tags=[page_title])
     st.info("对话历史已清空！", icon="✅")
 
 if change_config:
