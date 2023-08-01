@@ -80,7 +80,7 @@ if user_message := st.chat_input("你好！"):
 
     # 取相关QA和文档
     contexts = retrieve_contexts(
-        question="你好",
+        question=user_message,
         document_ids=[
             "chato_file_862",
             "chato_file_863",
