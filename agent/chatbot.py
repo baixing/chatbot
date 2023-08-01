@@ -26,7 +26,7 @@ class OpenAI:
     def add_message(self, role, content):
         self.messages.append({"role": role, "content": content})
 
-    def chat(self, user_message, stream=False, function_call=False):
+    def chat(self, user_message, stream=True, function_call=False):
         self.messages.append({"role": "user", "content": user_message})
         if not stream:
             if not function_call:
@@ -78,17 +78,29 @@ class Claude:
         else:
             self.messages += anthropic.HUMAN_PROMPT + " " + content
 
-    def chat(self, user_message):
+    def chat(self, user_message, stream=True):
         self.messages += (
             anthropic.HUMAN_PROMPT + " " + user_message + anthropic.AI_PROMPT + " "
         )
         claude = anthropic.Anthropic()
-        assistant_message = claude.completions.create(
-            prompt=self.messages,
-            model=self.model,
-            temperature=self.temperature,
-            max_tokens_to_sample=2048,
-            pl_tags=self.pl_tags,
-        ).completion
-        self.messages += assistant_message
-        return assistant_message
+        if not stream:
+            assistant_message = claude.completions.create(
+                prompt=self.messages,
+                model=self.model,
+                temperature=self.temperature,
+                max_tokens_to_sample=2048,
+                pl_tags=self.pl_tags,
+            ).completion
+            self.messages += assistant_message
+            return assistant_message
+        else:
+            assistant_response = claude.completions.create(
+                prompt=self.messages,
+                model=self.model,
+                temperature=self.temperature,
+                max_tokens_to_sample=2048,
+                stream=True,
+                pl_tags=self.pl_tags,
+            )
+            for chunk in assistant_response:
+                yield chunk.completion
