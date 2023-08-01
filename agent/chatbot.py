@@ -2,6 +2,7 @@ import os
 import streamlit as st
 
 import promptlayer
+
 promptlayer.api_key = st.secrets["promptlayer"]["api_key"]
 os.environ["PROMPTLAYER_API_KEY"] = st.secrets["promptlayer"]["api_key"]
 
@@ -17,6 +18,7 @@ os.environ["ANTHROPIC_API_KEY"] = st.secrets["anthropic"]["api_key"]
 class OpenAI:
     def __init__(self, **kwargs):
         self.messages = kwargs.get("messages", [])
+        self.functions = kwargs.get("functions", None)
         self.model = kwargs.get("model", "gpt-3.5-turbo")
         self.temperature = kwargs.get("temperature", None)
         self.pl_tags = kwargs.get("pl_tags", [])
@@ -24,16 +26,30 @@ class OpenAI:
     def add_message(self, role, content):
         self.messages.append({"role": role, "content": content})
 
-    def chat(self, user_message):
+    def chat(self, user_message, function_call=False):
         self.messages.append({"role": "user", "content": user_message})
-        assistant_message = openai.ChatCompletion.create(
-            messages=self.messages,
-            model=self.model,
-            temperature=self.temperature,
-            pl_tags=self.pl_tags,
-        )["choices"][0]["message"]
-        self.messages.append(assistant_message)
-        return assistant_message["content"]
+        if not function_call:
+            assistant_message = openai.ChatCompletion.create(
+                messages=self.messages,
+                model=self.model,
+                temperature=self.temperature,
+                pl_tags=self.pl_tags,
+            )["choices"][0]["message"]
+            self.messages.append(assistant_message)
+            return assistant_message["content"]
+        else:
+            assistant_message = openai.ChatCompletion.create(
+                messages=self.messages,
+                functions=self.functions,
+                model=self.model,
+                temperature=self.temperature,
+                pl_tags=self.pl_tags,
+            )["choices"][0]["message"]
+            if assistant_message["content"]:
+                self.messages.append(assistant_message)
+                return False, assistant_message["content"]
+            else:
+                return True, assistant_message["function_call"]
 
 
 class Claude:

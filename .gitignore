@@ -1,3 +1,4 @@
-.streamlit/secrets.toml
-.vscode/settings.json
+.streamlit
+.vscode
 __pycache__
+notebook

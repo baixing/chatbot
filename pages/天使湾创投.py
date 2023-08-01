@@ -1,11 +1,22 @@
 import streamlit as st
 
-import agent
-from utils import render_messages
+from utils import render_messages, create_chatbot
 
-st.title("天使湾创投 V3")  # Single prompt + Claude 2
 
-system_message = """===
+# ------------------------------网页------------------------------
+page_title = "天使湾创投"
+st.set_page_config(
+    page_title=page_title,
+    page_icon="https://p.ipic.vip/mawii3.jpeg",
+    initial_sidebar_state="collapsed",
+)
+
+# ------------------------------侧边栏------------------------------
+with st.sidebar:
+    st.header("机器人配置")
+    system_message = st.text_area(
+        label="角色设定",
+        value="""===
 角色:
 你是一位擅长沟通、智商情商都很高，讲话既幽默妥当，又逻辑清晰、一针见血的职业投资人，就职于天使湾创投。
 ===
@@ -34,39 +45,46 @@ system_message = """===
   b. 如果还未成立公司，请列出你们计划中的注册地点、股东、股份比例，及预留员工期权池。 
 8. 本轮融资，你们准备向天使湾融多少，最多出让多少股份？
   a. 这笔钱预计将达到什么目标？（注意：融资是件很严肃的事，请务必填一个诚实合理的融资方案，以免被我们误杀）。
-  b. 在本次融资前你们有否融过资？如有，请提供上轮融资时间，融资金额，出让比例。"""
-
-if "infobot_v3" not in st.session_state:
-    st.session_state.infobot_v3 = agent.Claude(temperature=0.0, pl_tags=["info_v3"])
-    HUMAN_PROMPT = "\n\nHuman:"
-    AI_PROMPT = "\n\nAssistant:"
-    st.session_state.infobot_v3.messages = (
-        HUMAN_PROMPT
-        + " "
-        + system_message
-        + AI_PROMPT
-        + " "
-        + "明白了，我将会真实生动地扮演一位擅长沟通、智商情商都很高，讲话既幽默妥当，又逻辑清晰、一针见血的职业投资人，与来访的创业团队聊天，解答对方的疑惑，并在对方表现出投资意向时，在交谈中一步步完善地询问和了解他们的个人信息、项目情况和融资意向。我将永不出戏，永不脱离我的角色与职责。"
+  b. 在本次融资前你们有否融过资？如有，请提供上轮融资时间，融资金额，出让比例。
+===
+投资人：“明白了，我将会真实生动地扮演一位擅长沟通、智商情商都很高，讲话既幽默妥当，又逻辑清晰、一针见血的职业投资人，与来访的创业团队聊天，解答对方的疑惑，并在对方表现出投资意向时，在交谈中一步步完善地询问和了解他们的个人信息、项目情况和融资意向。我将永不出戏，永不脱离我的角色与职责。”""",
     )
-    st.session_state.infobot_v3_messages = []
+    model = st.selectbox("模型", options=["GPT-3.5", "GPT-4", "Claude 2"])
+    temperature = st.slider("随机性", min_value=0.0, max_value=1.0, step=0.01, value=0.0)
+    change_config = st.button(label="更改配置")
+    clean_history = st.button(label="清空对话历史")
 
+if "current_page" not in st.session_state:
+    st.session_state.current_page = page_title
 
-render_messages(st.session_state.infobot_v3_messages)
+if st.session_state.current_page != page_title or "chatbot" not in st.session_state:
+    st.session_state.messages = []
+    create_chatbot(model, temperature, system_message, pl_tags=[page_title])
+    st.session_state.current_page = page_title
 
+if clean_history:
+    st.session_state.messages = []
+    st.info("对话历史已清空！", icon="✅")
+
+if change_config:
+    create_chatbot(model, temperature, system_message, pl_tags=[page_title])
+    st.info("机器人配置已更改！", icon="✅")
+
+# ------------------------------对话框------------------------------
+st.title(page_title)  # 渲染标题
+render_messages(st.session_state.messages)  # 渲染对话历史
 if user_message := st.chat_input("你好！"):
     # 渲染并储存用户消息
     with st.chat_message(name="user", avatar="🧑‍💻"):
         st.markdown(user_message)
-    st.session_state.infobot_v3_messages.append(
-        {"role": "user", "content": user_message}
-    )
+    st.session_state.messages.append({"role": "user", "content": user_message})
 
     # 发给ChatBot
-    assistant_message = st.session_state.infobot_v3.chat(user_message)
+    assistant_message = st.session_state.chatbot.chat(user_message)
 
     # 渲染并储存ChatBot消息
     with st.chat_message(name="assistant", avatar="🤖"):
         st.markdown(assistant_message)
-    st.session_state.infobot_v3_messages.append(
+    st.session_state.messages.append(
         {"role": "assistant", "content": assistant_message}
     )
