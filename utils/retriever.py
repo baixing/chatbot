@@ -17,7 +17,7 @@ def retrieve_contexts(question, document_ids, priority="qa"):
         result = response.json()
         return result["data"]
 
-    qa_results = retrieve("qa", question, document_ids, 3)
+    qa_results = retrieve("qa", question, document_ids, 5)
     if qa_results:
         qa_contexts = [
             {
@@ -28,7 +28,7 @@ def retrieve_contexts(question, document_ids, priority="qa"):
             for result in qa_results
         ]
 
-    document_results = retrieve("document", question, document_ids, 3)
+    document_results = retrieve("document", question, document_ids, 5)
     if document_results:
         document_contexts = [
             {"content": result["content"], "score": result["score"]}
@@ -36,11 +36,11 @@ def retrieve_contexts(question, document_ids, priority="qa"):
         ]
 
     contexts = []
-    if priority == "qa" and qa_results:
+    if priority == "qa":
         contexts = qa_contexts
         if not contexts:
             contexts = document_contexts
-    elif priority == "document" and document_results:
+    else:
         contexts = document_contexts
         if not contexts:
             contexts = qa_contexts
