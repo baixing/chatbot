@@ -2,3 +2,4 @@ streamlit
 promptlayer
 openai
 anthropic
+tiktoken
