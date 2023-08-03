@@ -33,6 +33,10 @@ def create_chatbot(model, temperature, system_message, functions=None, pl_tags=[
         st.session_state.chatbot = agent.OpenAI(
             functions=functions, model="gpt-4", temperature=temperature, pl_tags=pl_tags
         )
+    elif model == "Claude 1":
+        st.session_state.chatbot = agent.Claude(
+            model="claude-1", temperature=temperature, pl_tags=pl_tags
+        )
     elif model == "Claude 2":
         st.session_state.chatbot = agent.Claude(
             model="claude-2", temperature=temperature, pl_tags=pl_tags
