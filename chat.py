@@ -18,7 +18,7 @@ st.set_page_config(
 with st.sidebar:
     st.header("机器人配置")
     system_message = st.text_area(label="角色设定", placeholder="机器人需要扮演什么角色？")
-    model = st.selectbox("模型", options=["GPT-3.5", "GPT-4", "Claude 2"])
+    model = st.selectbox("模型", options=["GPT-3.5", "GPT-4", "Claude 2", "Claude Instant"])
     temperature = st.slider("随机性", min_value=0.0, max_value=1.0, step=0.01, value=0.0)
     change_config = st.button(label="确认配置")
     clean_history = st.button(label="清空对话历史")
