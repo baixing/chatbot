@@ -12,6 +12,8 @@ anthropic = promptlayer.anthropic
 
 class OpenAI:
     def __init__(self, **kwargs):
+        openai.api_type = "open_ai"
+        openai.api_version = None
         openai.api_base = st.secrets["openai"]["api_base"]
         openai.api_key = st.secrets["openai"]["api_key"]
         self.messages = kwargs.get("messages", [])
@@ -176,7 +178,8 @@ class Chato:
             "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
             "Content-Type": "application/json",
         }
-        response = requests.request("POST", url, headers=headers, data=payload)
+        response = requests.request("POST", url, headers=headers, data=payload).text
+        response = json.loads(response)
         return response["data"]["content"]
 
     def chat(self, user_message):

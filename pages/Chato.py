@@ -8,7 +8,7 @@ from utils import render_messages
 page_title = "Chato"  # 网页标题
 st.set_page_config(
     page_title=page_title,
-    page_icon="random",
+    page_icon="https://p.ipic.vip/syn7as.png",
     menu_items={
         "About": "Hi! **Jamie** developed me! Contact him [here](https://github.com/dwjamie/chatbot) if you have any problems."
     },
@@ -53,15 +53,6 @@ if user_message := st.chat_input("你好！"):
     assistant_response = st.session_state.chatbot.chat_no_stream(user_message)
 
     # 渲染并储存ChatBot消息
-    assistant_message = ""
-    with st.chat_message(name="assistant", avatar="🤖"):
-        placeholder = st.empty()
-        for token in assistant_response:
-            assistant_message += token
-            placeholder.write(assistant_message + "▌")
-        placeholder.empty()
-        st.markdown(assistant_message)
-
     with st.chat_message(name="assistant", avatar="🤖"):
         st.markdown(assistant_response)
 
